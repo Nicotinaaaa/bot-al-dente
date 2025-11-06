@@ -1,0 +1,18 @@
+{
+  "users": {
+    "823929378371141652": {
+      "totale": 280784,
+      "inizio": null
+    }
+  },
+  "messages": {
+    "cartelliniChannel": "1435776987913257102",
+    "cartelliniMessageId": "1435939393658683402",
+    "monitorChannel": "1435934502236061746",
+    "monitorMessageId": "1435938012013006859"
+  },
+  "embedMessage": {
+    "channelId": "1435934502236061746",
+    "messageId": "1435938012013006859"
+  }
+}

@@ -1,0 +1,60 @@
+const { Client, GatewayIntentBits, SlashCommandBuilder, Routes, REST } = require('discord.js');
+
+const token = 'INSERISCI_IL_TUO_TOKEN_DEL_BOT';
+const clientId = 'INSERISCI_IL_TUO_CLIENT_ID';
+const guildId = 'INSERISCI_IL_TUO_SERVER_ID'; // opzionale
+
+const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+
+const commands = [
+  new SlashCommandBuilder()
+    .setName('fattura')
+    .setDescription('Crea una fattura')
+    .addStringOption(o => o.setName('fatturante').setDescription('Chi emette la fattura').setRequired(true))
+    .addStringOption(o => o.setName('cliente').setDescription('A chi è destinata la fattura').setRequired(true))
+    .addIntegerOption(o => o.setName('importo').setDescription('Importo in $').setRequired(true))
+    .addStringOption(o => o.setName('motivo').setDescription('Motivo della fattura').setRequired(true))
+].map(c => c.toJSON());
+
+const rest = new REST({ version: '10' }).setToken(token);
+
+(async () => {
+  try {
+    console.log('Registrazione comandi...');
+    await rest.put(Routes.applicationCommands(clientId), { body: commands });
+    console.log('✅ Comandi registrati!');
+  } catch (err) {
+    console.error(err);
+  }
+})();
+
+client.on('ready', () => {
+  console.log(`✅ Bot avviato come ${client.user.tag}`);
+});
+
+client.on('interactionCreate', async (interaction) => {
+  if (!interaction.isChatInputCommand()) return;
+  if (interaction.commandName === 'fattura') {
+    const fatturante = interaction.options.getString('fatturante');
+    const cliente = interaction.options.getString('cliente');
+    const importo = interaction.options.getInteger('importo');
+    const motivo = interaction.options.getString('motivo');
+
+    const embed = {
+      color: 0x00ff99,
+      title: '📜 Nuova Fattura',
+      fields: [
+        { name: '👤 Fatturante', value: fatturante },
+        { name: '💸 Cliente', value: cliente },
+        { name: '💰 Importo', value: `${importo}$` },
+        { name: '📋 Motivo', value: motivo }
+      ],
+      footer: { text: `Creata da ${interaction.user.tag}` },
+      timestamp: new Date()
+    };
+
+    await interaction.reply({ embeds: [embed] });
+  }
+});
+
+client.login(token);
